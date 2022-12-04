@@ -257,9 +257,9 @@ class gibMacRecovery:
         print("Running command:\n")
         print(" ".join(display_args))
         print("")
-        print("Handing control to macrecovery.py...")
+        out = self.r.run({"args":[sys.executable]+args,"stream":True})
         print("")
-        os.execv(sys.executable,[sys.executable]+args)
+        self.u.grab("Press [enter] to return...")
 
     def main(self):
         self.u.head()
