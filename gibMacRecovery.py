@@ -41,6 +41,7 @@ class gibMacRecovery:
         self.target_macos = None
         self.target_mac = None
         self.target_mlb = None
+        self.latest_default = "default"
 
     def update_macrecovery(self):
         self.u.head("Downloading Required Files")
@@ -101,7 +102,7 @@ class gibMacRecovery:
                 print("and is a valid json file!")
                 print("")
                 self.u.grab("Press [enter] to return...")
-                return (self.target_macos,self.target_mac,self.target_mlb)
+                return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
             for i,v in enumerate(os_list,start=1):
                 print("{}. {}".format(str(i),v))
             print("")
@@ -110,7 +111,7 @@ class gibMacRecovery:
             print("")
             menu = self.u.grab("Please select an option:  ")
             if not menu: continue
-            if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb)
+            if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
             elif menu.lower() == "q": self.u.custom_quit()
             try:
                 menu = int(menu)-1
@@ -122,7 +123,7 @@ class gibMacRecovery:
             for mac in self.boards:
                 if self.boards[mac].lower() == os_list[menu]:
                     # Got it
-                    return (os_list[menu],mac,"00000000000000000")
+                    return (os_list[menu],mac,"00000000000000000","latest" if "latest" in os_list[menu].lower() else "default")
 
     def input_mac_model(self):
         while True:
@@ -131,6 +132,7 @@ class gibMacRecovery:
             print("     Target macOS: {}".format(self.target_macos))
             print("  Target Board ID: {}".format(self.target_mac))
             print("       Target MLB: {}".format(self.target_mlb))
+            print("   Latest/Default: {}".format(self.latest_default))
             print("")
             print("Board IDs must begin with 'Mac-' followed by 8 or 16 hexadecimal digits.")
             print("")
@@ -139,7 +141,7 @@ class gibMacRecovery:
             print("")
             menu = self.u.grab("Please type the target Board ID:  ")
             if not menu: continue
-            if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb)
+            if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
             elif menu .lower() == "q": self.u.custom_quit()
             # Let's make sure we have a valid Mac-[8-16 hex] format
             if menu.lower().startswith("mac-"):
@@ -150,7 +152,7 @@ class gibMacRecovery:
             # Got a valid format - return it and any matching macOS version
             model = "Mac-"+menu
             macos = self.boards.get(model,"Unknown")
-            return (macos,model,self.target_mlb)
+            return (macos,model,self.target_mlb,self.latest_default)
     
     def input_mlb(self):
         while True:
@@ -159,6 +161,7 @@ class gibMacRecovery:
             print("     Target macOS: {}".format(self.target_macos))
             print("  Target Board ID: {}".format(self.target_mac))
             print("       Target MLB: {}".format(self.target_mlb))
+            print("   Latest/Default: {}".format(self.latest_default))
             print("")
             print("MLBs will be padded with 0s to 17 characters.")
             print("")
@@ -167,12 +170,12 @@ class gibMacRecovery:
             print("")
             menu = self.u.grab("Please type the target MLB:  ")
             if not menu: continue
-            if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb)
+            if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
             elif menu .lower() == "q": self.u.custom_quit()
             # Only allow alphanumeric chars, and pad to 17 with 0s
             if not menu.isalnum(): continue
             mlb = menu.upper().rjust(17,"0")
-            return (self.target_macos,self.target_mac,mlb)
+            return (self.target_macos,self.target_mac,mlb,self.latest_default)
 
     def select_target_recovery(self):
         os_list = list(self.recovery)[::-1] # Sort latest -> oldest
@@ -182,13 +185,14 @@ class gibMacRecovery:
             print("     Target macOS: {}".format(self.target_macos))
             print("  Target Board ID: {}".format(self.target_mac))
             print("       Target MLB: {}".format(self.target_mlb))
+            print("   Latest/Default: {}".format(self.latest_default))
             print("")
             if not self.recovery:
                 print("No macOS versions found!  Make sure recovery_urls.txt is in the Scripts")
                 print("directory!")
                 print("")
                 self.u.grab("Press [enter] to return...")
-                return (self.target_macos,self.target_mac,self.target_mlb)
+                return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
             for i,v in enumerate(os_list,start=1):
                 print("{}. {} ({:,} total)".format(str(i).rjust(2),v,len(self.recovery[v])))
             print("")
@@ -197,7 +201,7 @@ class gibMacRecovery:
             print("")
             menu = self.u.grab("Please select an option:  ")
             if not menu: continue
-            if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb)
+            if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
             elif menu.lower() == "q": self.u.custom_quit()
             try:
                 menu = int(menu)-1
@@ -221,7 +225,7 @@ class gibMacRecovery:
                     print("")
                     menu = self.u.grab("Please select an option:  ")
                     if not menu: continue
-                    if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb)
+                    if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
                     elif menu.lower() == "q": self.u.custom_quit()
                     try:
                         menu = int(menu)-1
@@ -232,7 +236,8 @@ class gibMacRecovery:
                     break            
             model = self.recovery[macos][index]["board_id"]
             mlb   = self.recovery[macos][index]["mlb"]
-            return (macos,model,mlb)
+            ld    = "latest" if "latest" in macos.lower() else "default"
+            return (macos,model,mlb,ld)
 
     def download_macos(self):
         if not self.target_mac: return # wut
@@ -241,6 +246,7 @@ class gibMacRecovery:
         print("     Target macOS: {}".format(self.target_macos))
         print("  Target Board ID: {}".format(self.target_mac))
         print("       Target MLB: {}".format(self.target_mlb))
+        print("   Latest/Default: {}".format(self.latest_default))
         print("")
         if os.path.exists(self.output):
             print("{} already exists - removing...".format(os.path.basename(self.output)))
@@ -248,9 +254,7 @@ class gibMacRecovery:
         if not os.path.exists(self.output):
             print("Creating {}...".format(os.path.basename(self.output)))
             os.mkdir(self.output)
-        args = [self.macrecovery_path,"-b",self.target_mac,"-m",self.target_mlb,"-o",self.output]
-        if str(self.target_macos).lower().startswith(("latest","unknown","none")): # Use the -os latest flags
-            args.extend(["-os","latest"])
+        args = [self.macrecovery_path,"-b",self.target_mac,"-m",self.target_mlb,"-o",self.output,"-os",self.latest_default]
         args.append("download")
         display_args = [os.path.basename(args[0])]+args[1:]
         print("")
@@ -271,14 +275,16 @@ class gibMacRecovery:
         print("     Target macOS: {}".format(self.target_macos))
         print("  Target Board ID: {}".format(self.target_mac))
         print("       Target MLB: {}".format(self.target_mlb))
+        print("   Latest/Default: {}".format(self.latest_default))
         print("")
         print("1. {} macrecovery.py, boards.json, and recovery_urls.txt".format("Update" if all((os.path.exists(x) for x in (self.recovery_path,self.macrecovery_path,self.boards_path))) else "Install"))
         print("2. Select Targets From recovery_urls.txt ({:,} available)".format(len(self.recovery)))
         print("3. Select Targets From boards.json ({:,} available)".format(len(set(self.boards.values()))))
         print("4. Input Custom Board ID")
         print("5. Input Custom MLB")
+        print("6. Toggle Latest/Default")
         if self.target_mac and self.target_mlb:
-            print("6. Download macOS Recovery For {}".format(self.target_mac))
+            print("7. Download macOS Recovery For {}".format(self.target_mac))
         print("")
         print("Q. Quit")
         print("")
@@ -287,14 +293,16 @@ class gibMacRecovery:
         if menu.lower() == "q": self.u.custom_quit()
         elif menu == "1": self.update_macrecovery()
         elif menu == "2":
-            self.target_macos,self.target_mac,self.target_mlb = self.select_target_recovery()
+            self.target_macos,self.target_mac,self.target_mlb,self.latest_default = self.select_target_recovery()
         elif menu == "3":
-            self.target_macos,self.target_mac,self.target_mlb = self.select_target_macos()
+            self.target_macos,self.target_mac,self.target_mlb,self.latest_default = self.select_target_macos()
         elif menu == "4":
-            self.target_macos,self.target_mac,self.target_mlb = self.input_mac_model()
+            self.target_macos,self.target_mac,self.target_mlb,self.latest_default = self.input_mac_model()
         elif menu == "5" and self.target_mac:
-            self.target_macos,self.target_mac,self.target_mlb = self.input_mlb()
+            self.target_macos,self.target_mac,self.target_mlb,self.latest_default = self.input_mlb()
         elif menu == "6":
+            self.latest_default = "latest" if self.latest_default == "default" else "default"
+        elif menu == "7":
             self.download_macos()
 
 if __name__ == '__main__':
