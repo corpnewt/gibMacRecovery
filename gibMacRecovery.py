@@ -30,7 +30,6 @@ class gibMacRecovery:
         if os.name == "nt":
             self.min_w = 120
             self.min_h = 30
-        self.resize()
         if not os.path.exists(self.boards_path) or not os.path.exists(self.macrecovery_path) or not os.path.exists(self.recovery_path):
             self.update_macrecovery()
         self.boards = {}
@@ -89,30 +88,36 @@ class gibMacRecovery:
         self.u.resize(max(width,self.min_w),max(height,self.min_h))
 
     def select_target_macos(self):
-        os_list = sorted(list(set(self.boards.values())),reverse=True)
-        while True:
+        if not self.boards:
             self.u.head("Select Target macOS Version")
             print("")
-            print("     Target macOS: {}".format(self.target_macos))
-            print("  Target Board ID: {}".format(self.target_mac))
-            print("       Target MLB: {}".format(self.target_mlb))
+            print("No macOS versions found!  Make sure boards.json is in the Scripts directory,")
+            print("and is a valid json file!")
             print("")
-            if not self.boards:
-                print("No macOS versions found!  Make sure boards.json is in the Scripts directory,")
-                print("and is a valid json file!")
-                print("")
-                self.u.grab("Press [enter] to return...")
-                return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
+            self.u.grab("Press [enter] to return...")
+            return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
+        os_list = sorted(list(set(self.boards.values())),reverse=True)
+        while True:
+            lines = [""]
+            lines.append("     Target macOS: {}".format(self.target_macos))
+            lines.append("  Target Board ID: {}".format(self.target_mac))
+            lines.append("       Target MLB: {}".format(self.target_mlb))
+            lines.append("")
             for i,v in enumerate(os_list,start=1):
-                print("{}. {}".format(str(i),v))
-            print("")
-            print("M. Main Menu")
-            print("Q. Quit")
-            print("")
+                lines.append("{}. {}".format(str(i),v))
+            lines.append("")
+            lines.append("M. Main Menu")
+            lines.append("Q. Quit")
+            lines.append("")
+            self.resize(height=len(lines)+4)
+            self.u.head("Select Target macOS Version")
+            print("\n".join(lines))
             menu = self.u.grab("Please select an option:  ")
             if not menu: continue
             if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
-            elif menu.lower() == "q": self.u.custom_quit()
+            elif menu.lower() == "q":
+                self.resize()
+                self.u.custom_quit()
             try:
                 menu = int(menu)-1
                 assert 0 <= menu < len(os_list)
@@ -178,31 +183,36 @@ class gibMacRecovery:
             return (self.target_macos,self.target_mac,mlb,self.latest_default)
 
     def select_target_recovery(self):
-        os_list = list(self.recovery)[::-1] # Sort latest -> oldest
-        while True:
+        if not self.recovery:
             self.u.head("Select Target From recovery_urls.txt")
             print("")
-            print("     Target macOS: {}".format(self.target_macos))
-            print("  Target Board ID: {}".format(self.target_mac))
-            print("       Target MLB: {}".format(self.target_mlb))
-            print("          OS Type: {}".format(self.latest_default))
+            print("No macOS versions found!  Make sure recovery_urls.txt is in the Scripts")
+            print("directory!")
             print("")
-            if not self.recovery:
-                print("No macOS versions found!  Make sure recovery_urls.txt is in the Scripts")
-                print("directory!")
-                print("")
-                self.u.grab("Press [enter] to return...")
-                return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
+            self.u.grab("Press [enter] to return...")
+            return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
+        os_list = list(self.recovery)[::-1] # Sort latest -> oldest
+        while True:
+            lines = [""]
+            lines.append("     Target macOS: {}".format(self.target_macos))
+            lines.append("  Target Board ID: {}".format(self.target_mac))
+            lines.append("       Target MLB: {}".format(self.target_mlb))
+            lines.append("          OS Type: {}".format(self.latest_default))
+            lines.append("")
             for i,v in enumerate(os_list,start=1):
-                print("{}. {} ({:,} total)".format(str(i).rjust(2),v,len(self.recovery[v])))
-            print("")
-            print("M. Main Menu")
-            print("Q. Quit")
-            print("")
+                lines.append("{}. {} ({:,} total)".format(str(i).rjust(2),v,len(self.recovery[v])))
+            lines.append("")
+            lines.append("M. Main Menu")
+            lines.append("Q. Quit")
+            self.resize(height=len(lines)+4)
+            self.u.head("Select Target From recovery_urls.txt")
+            print("\n".join(lines))
             menu = self.u.grab("Please select an option:  ")
             if not menu: continue
             if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
-            elif menu.lower() == "q": self.u.custom_quit()
+            elif menu.lower() == "q":
+                self.resize()
+                self.u.custom_quit()
             try:
                 menu = int(menu)-1
                 assert 0 <= menu < len(self.recovery)
@@ -213,20 +223,24 @@ class gibMacRecovery:
             index = 0
             if len(self.recovery[macos]) > 1:
                 while True:
-                    self.u.head("Select Board ID and MLB")
-                    print("")
-                    print("{} has {:,} urls:".format(macos,len(self.recovery[macos])))
-                    print("")
+                    lines = [""]
+                    lines.append("{} has {:,} urls:".format(macos,len(self.recovery[macos])))
+                    lines.append("")
                     for i,v in enumerate(self.recovery[macos],start=1):
-                        print("{}. {} - {}".format(str(i),v["board_id"],v["mlb"]))
-                    print("")
-                    print("M. Main Menu")
-                    print("Q. Quit")
-                    print("")
+                        lines.append("{}. {} - {}".format(str(i),v["board_id"],v["mlb"]))
+                    lines.append("")
+                    lines.append("M. Main Menu")
+                    lines.append("Q. Quit")
+                    lines.append("")
+                    self.resize(height=len(lines)+4)
+                    self.u.head("Select Board ID and MLB")
+                    print("\n".join(lines))
                     menu = self.u.grab("Please select an option:  ")
                     if not menu: continue
                     if menu.lower() == "m": return (self.target_macos,self.target_mac,self.target_mlb,self.latest_default)
-                    elif menu.lower() == "q": self.u.custom_quit()
+                    elif menu.lower() == "q":
+                        self.resize()
+                        self.u.custom_quit()
                     try:
                         menu = int(menu)-1
                         assert 0 <= menu < len(self.recovery)
@@ -266,6 +280,7 @@ class gibMacRecovery:
         self.u.grab("Press [enter] to return...")
 
     def main(self):
+        self.resize()
         self.u.head()
         print("")
         print("   macrecovery.py: {}".format("Located" if os.path.exists(self.macrecovery_path) else "NOT FOUND"))
