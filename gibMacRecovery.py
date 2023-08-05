@@ -204,6 +204,7 @@ class gibMacRecovery:
             lines.append("")
             lines.append("M. Main Menu")
             lines.append("Q. Quit")
+            lines.append("")
             self.resize(height=len(lines)+4)
             self.u.head("Select Target From recovery_urls.txt")
             print("\n".join(lines))
