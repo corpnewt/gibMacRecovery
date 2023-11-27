@@ -53,6 +53,10 @@ class gibMacRecovery:
             print("Something went wrong:\n{}\n".format(e))
             self.u.grab("Press [enter] to return...")
             return
+        if os.path.exists(self.boards_path):
+            try: self.boards = json.load(open(self.boards_path))
+            except: pass
+        self.recovery = self.parse_recovery()
         print("\nDone.\n")
         self.u.grab("Returning in 5 seconds...",timeout=5)
 
