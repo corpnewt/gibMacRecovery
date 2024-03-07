@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from Scripts import downloader,utils,run
+from collections import OrderedDict
 import os, shutil, sys, json
 
 class gibMacRecovery:
@@ -7,20 +8,14 @@ class gibMacRecovery:
         self.d = downloader.Downloader()
         self.u = utils.Utils("gibMacRecovery")
         self.r = run.Run()
-        if sys.version_info < (3, 0):
-            maj,mnr,mic = sys.version_info[:3]
-            self.u.head()
-            print("")
-            print("Incompatible python version!")
-            print("macrecovery.py requires at least python 3")
-            print("")
-            print("Currently running {}.{}.{}".format(maj,mnr,mic))
-            print("")
-            self.u.grab("Press [enter] to exit...")
-            exit()
+        if sys.version_info < (3,0):
+            # Use the macrecovery-legacy.py fork
+            self.macrecovery_url = "https://raw.githubusercontent.com/corpnewt/macrecovery-legacy/master/macrecovery-legacy.py"
+        else:
+            # Use the main fork which only supports python 3
+            self.macrecovery_url = "https://raw.githubusercontent.com/acidanthera/OpenCorePkg/master/Utilities/macrecovery/macrecovery.py"
         self.boards_url = "https://raw.githubusercontent.com/acidanthera/OpenCorePkg/master/Utilities/macrecovery/boards.json"
         self.boards_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scripts",os.path.basename(self.boards_url))
-        self.macrecovery_url = "https://raw.githubusercontent.com/acidanthera/OpenCorePkg/master/Utilities/macrecovery/macrecovery.py"
         self.macrecovery_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scripts",os.path.basename(self.macrecovery_url))
         self.recovery_url = "https://github.com/acidanthera/OpenCorePkg/raw/master/Utilities/macrecovery/recovery_urls.txt"
         self.recovery_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scripts",os.path.basename(self.recovery_url))
@@ -32,7 +27,7 @@ class gibMacRecovery:
             self.min_h = 30
         if not os.path.exists(self.boards_path) or not os.path.exists(self.macrecovery_path) or not os.path.exists(self.recovery_path):
             self.update_macrecovery()
-        self.boards = {}
+        self.boards = OrderedDict()
         if os.path.exists(self.boards_path):
             try: self.boards = json.load(open(self.boards_path))
             except: pass
@@ -62,10 +57,10 @@ class gibMacRecovery:
 
     def parse_recovery(self):
         if not os.path.exists(self.recovery_path):
-            return {}
+            return OrderedDict()
         with open(self.recovery_path,"r") as f:
             r = f.read()
-        r_dict = {}
+        r_dict = OrderedDict()
         last_os = None
         for line in r.split("\n"):
             if not line.strip(): continue # Skip empty lines
@@ -288,7 +283,10 @@ class gibMacRecovery:
         self.resize()
         self.u.head()
         print("")
-        print("   macrecovery.py: {}".format("Located" if os.path.exists(self.macrecovery_path) else "NOT FOUND"))
+        print("   macrecovery.py: {}{}".format(
+            "Located" if os.path.exists(self.macrecovery_path) else "NOT FOUND",
+            " (legacy version for python 2)" if sys.version_info < (3,0) else ""
+        ))
         print("      boards.json: {}".format("Located" if os.path.exists(self.boards_path) else "NOT FOUND"))
         print("recovery_urls.txt: {}".format("Located" if os.path.exists(self.recovery_path) else "NOT FOUND"))
         print("")
