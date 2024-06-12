@@ -8,12 +8,14 @@ class gibMacRecovery:
         self.d = downloader.Downloader()
         self.u = utils.Utils("gibMacRecovery")
         self.r = run.Run()
-        if sys.version_info < (3,0):
+        '''if sys.version_info < (3,0):
             # Use the macrecovery-legacy.py fork
             self.macrecovery_url = "https://raw.githubusercontent.com/corpnewt/macrecovery-legacy/master/macrecovery-legacy.py"
         else:
             # Use the main fork which only supports python 3
-            self.macrecovery_url = "https://raw.githubusercontent.com/acidanthera/OpenCorePkg/master/Utilities/macrecovery/macrecovery.py"
+            self.macrecovery_url = "https://raw.githubusercontent.com/acidanthera/OpenCorePkg/master/Utilities/macrecovery/macrecovery.py"'''
+        # Override as os.get_terminal_size().columns is broken when run as a subprocess
+        self.macrecovery_url = "https://raw.githubusercontent.com/corpnewt/macrecovery-legacy/master/macrecovery-legacy.py"
         self.boards_url = "https://raw.githubusercontent.com/acidanthera/OpenCorePkg/master/Utilities/macrecovery/boards.json"
         self.boards_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scripts",os.path.basename(self.boards_url))
         self.macrecovery_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scripts",os.path.basename(self.macrecovery_url))
