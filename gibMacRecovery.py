@@ -1,13 +1,12 @@
 #!/usr/bin/env python
-from Scripts import downloader,utils,run
+from Scripts import downloader,utils
 from collections import OrderedDict
-import os, shutil, sys, json
+import os, shutil, sys, json, subprocess
 
 class gibMacRecovery:
     def __init__(self):
         self.d = downloader.Downloader()
         self.u = utils.Utils("gibMacRecovery")
-        self.r = run.Run()
         '''if sys.version_info < (3,0):
             # Use the macrecovery-legacy.py fork
             self.macrecovery_url = "https://raw.githubusercontent.com/corpnewt/macrecovery-legacy/master/macrecovery-legacy.py"
@@ -277,7 +276,8 @@ class gibMacRecovery:
         print("Running command:\n")
         print(" ".join(display_args))
         print("")
-        out = self.r.run({"args":[sys.executable]+args,"stream":True})
+        p = subprocess.Popen([sys.executable]+args)
+        p.wait()
         print("")
         self.u.grab("Press [enter] to return...")
 
