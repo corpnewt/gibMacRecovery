@@ -242,7 +242,7 @@ class gibMacRecovery:
                         self.u.custom_quit()
                     try:
                         menu = int(menu)-1
-                        assert 0 <= menu < len(self.recovery)
+                        assert 0 <= menu < len(self.recovery[macos])
                     except:
                         continue
                     index = menu
