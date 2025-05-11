@@ -233,7 +233,7 @@ class GibMacRecovery:
             print("")
             self.u.grab("Press [enter] to return...")
             return self.target_macos, self.target_mac, self.target_mlb, self.latest_default
-        os_list = list(self.recovery)[::-1]  # Sort latest -> oldest
+        os_list = list(self.recovery)  # Sort oldest -> latest
         while True:
             lines = [
                 "", 
