@@ -33,7 +33,7 @@ class gibMacRecovery:
         self.recovery = self.parse_recovery()
         self.target_macos = None
         self.target_mac = None
-        self.target_mlb = None
+        self.target_mlb = "00000000000000000"
         self.latest_default = "default"
 
     def update_macrecovery(self):
